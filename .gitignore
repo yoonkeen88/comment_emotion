@@ -1,0 +1,9 @@
+/.DS_Store
+/keyword상해보험.csv
+/keyword연금보험.csv
+/merged_keywords_연금_상해_zeronull.csv
+/merged_keywords_연금_상해.csv
+/merged_keywords_연금_상해_cleaned.csv
+*.csv
+
+! ** comment_only.csv
