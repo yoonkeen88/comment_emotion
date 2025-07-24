@@ -66,7 +66,17 @@ def main(args):
     os.makedirs(args.output_dir, exist_ok=True)
     classifier = init_model()
 
+    start_chunk_index = args.start_chunk - 1
+
     for i, chunk in enumerate(chunks):
+        if i < start_chunk_index:
+            continue
+
+        save_path = os.path.join(args.output_dir, f"감정분석_결과_part{i+1}.csv")
+        if os.path.exists(save_path):
+            print(f"⏭️ 파일이 이미 존재하므로 청크 {i+1}를 건너<binary data, 2 bytes>니다: {save_path}")
+            continue
+
         print(f"🔄 청크 {i+1}/{len(chunks)} 분석 중...")
         print_gpu_memory()  # ✅ GPU 상태 출력
         results = [analyze_sentiment(text, classifier) for text in tqdm(chunk)]
@@ -75,7 +85,6 @@ def main(args):
         original_meta = df.iloc[i * args.chunk_size : i * args.chunk_size + len(chunk)].reset_index(drop=True)
         merged_df = pd.concat([original_meta, result_df], axis=1)
 
-        save_path = os.path.join(args.output_dir, f"감정분석_결과_part{i+1}.csv")
         merged_df.to_csv(save_path, index=False)
         print(f"✅ 저장 완료: {save_path}")
 
@@ -87,6 +96,7 @@ if __name__ == "__main__":
     parser.add_argument("--input", required=True, help="분석할 CSV 파일 경로")
     parser.add_argument("--output_dir", default="result_parts", help="결과 저장 폴더")
     parser.add_argument("--chunk_size", type=int, default=1000, help="청크 크기")
+    parser.add_argument("--start_chunk", type=int, default=1, help="시작할 청크 번호")
     args = parser.parse_args()
 
     main(args)
